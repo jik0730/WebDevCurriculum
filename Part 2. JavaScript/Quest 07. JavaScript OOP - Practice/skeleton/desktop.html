@@ -7,11 +7,18 @@
 	</head>
 	<body>
 		<section class="desktop">
+			<section class="window">
+				<div class="icon" style="left: 0px; top: 0px;">ICON</div>
+				<div class="icon folder" style="left: 150px; top: 0px;">FOLDER</div>
+				<div class="icon folder" style="left: 300px; top: 0px;">FOLDER</div>
+			</section>
 		</section>
 
 		<script>
+            var icon = document.querySelectorAll('.icon');
 			var myDesktop = new Desktop(
 				/* TODO: myDesktop 인스턴스의 생성자의 변수로 무엇이 들어가야 할까요? */
+                icon[0], icon[1], icon[2]
 			);
 		</script>
 	</body>

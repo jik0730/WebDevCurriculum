@@ -1,5 +1,6 @@
 * {
-	/* TODO: 어떤 코드가 들어가야 할까요? */
+	font-family: 'octicons';
+    border: 1px solid #000000;
 }
 
 html {
@@ -8,6 +9,45 @@ html {
 
 body {
 	/* TODO: 어떤 코드가 들어가야 할까요? */
+    /*background-color: gray;*/
 }
 
 /* TODO: 또 어떤 코드들이 들어가야 할까요? */
+.main {
+
+}
+
+.main-detail {
+    
+}
+
+.main-header {
+
+}
+
+.main1 {
+    width: 500px;
+    height: 500px;
+    display: inline-block;
+}
+
+.main2 {
+    width: 100px;
+    height: 500px;
+    display: inline-block;
+}
+
+.header {
+    padding-left: 180px;
+    padding-right: 180px;
+    background-color: gray;
+}
+
+.footer {
+    padding-left: 180px;
+    padding-right: 180px;
+}
+
+.button {
+    float: right;
+}
