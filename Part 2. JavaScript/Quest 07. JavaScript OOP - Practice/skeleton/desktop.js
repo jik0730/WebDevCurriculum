@@ -1,65 +1,115 @@
-var Desktop = function(win, icon, folder1, folder2) {
+var Desktop = function(icon, folder1, folder2) {
     /* TODO: Desktop 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
-    this.icon = new Icon(win, icon, false);
-    this.folder1 = new Icon(win, folder1, true);
-    this.folder2 = new Icon(win, folder2, true);
+    this.icon = new Icon(icon, false, 'i1');
+    this.folder1 = new Icon(folder1, true, 'f1');
+    this.folder2 = new Icon(folder2, true, 'f2');
 };
 
-var Icon = function(win, icon, isFolder) {
+var Icon = function(icon, isFolder, id) {
     /* TODO: Icon 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
-    // this.isFolder = isFolder; // 폴더인지 아닌지
-    // this.open = openFolder; // 폴더라면, 더블클릭을 통한 폴더 열기 -> 함수 정의 필요
-    this.win = win;
+    // For icons
+    this.id = id;
     this.icon = icon;
-    this.xpos = window.getComputedStyle(this.icon).getPropertyValue('left');
-    this.ypos = window.getComputedStyle(this.icon).getPropertyValue('top');
-    this.isFolder = isFolder;
     this.move = move;
-    // var _x, _y, x_, y_;
+    var _x, _y, x_, y_;
+    var clicked = false;
 
-    this.icon.onmousedown = function() {
-        _x = event.clientX;
-        _y = event.clientY;
-        console.log(this);
-    }
-    // window.onmousedown = function() {
-    //     console.log(_x, _y, x_, y_);
-    //     console.log(this);
-    //     if(event.clientX != _x && event.clientY != _y) {
-    //         _x = -1;
-    //         _y = -1;
-    //     }
-    // }
-    this.win.onmousedown = function() {
-        console.log("HIHI");
-    }
-    this.icon.onmouseup = function() {
-        x_ = event.clientX;
-        y_ = event.clientY;
-        console.log(_x, _y, x_, y_);
-        if(_x == -1 && _y == -1) {
-            // do nothing
-        } else {
-            move(this, _x, _y, x_, y_);
+    this.icon.onmousemove = function(event) {
+        x_ = event.pageX;
+        y_ = event.pageY;
+        if(clicked) {
+            var gradient = move(this, _x, _y, x_, y_);
+            _x += gradient[0];
+            _y += gradient[1];
         }
+    }
+
+    this.icon.onmousedown = function(event) {
+        _x = event.pageX;
+        _y = event.pageY;
+        clicked = true;
+    }
+
+    this.icon.onmouseup = function(event) {
+        clicked = false;
+    }
+
+    // For folders
+    this.isFolder = isFolder;
+    var folder = null;
+    var opened = false;
+
+    if(isFolder) {
+        folder = new Folder({ className: 'fopened',
+                                left: '0px',
+                                top: '0px',
+                                width: '200px',
+                                height: '200px',
+                                id: this.id });
     }
 
     if(isFolder) {
         this.icon.ondblclick = function() {
-            console.log("HIHIHIHIHI");
+            console.log("HIIHHI");
+            folder.open();
         }
     }
-    
 };
 
-var Folder = function(folder) {
+var Folder = function(info) {
     /* TODO: Folder 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
-    // this.positionX;
-    // this.positionY; // 폴더 창의 위치..
-    // this.move = move; // 드래그를 통한 MOVE -> 함수 정의 필요
-    this.folder = folder;
-    this.folder.onclick = function() {
-        console.log("IANFOLDER");
+    this.folder = (function() {
+        var div = document.createElement("div");
+        var idAtt = document.createAttribute("id");
+        idAtt.value = info['id'];
+        var classAtt = document.createAttribute("class");
+        classAtt.value = info['className'];
+        var styleAtt = document.createAttribute("style");
+        styleAtt.value = 'left: ' + info['left'] + '; ' + 'top: ' + info['top'] + '; ' + 
+                          'width: ' + info['width'] + '; ' + 'height: ' + info['height'] + ';';
+        div.setAttributeNode(idAtt);
+        div.setAttributeNode(classAtt);
+        div.setAttributeNode(styleAtt);
+        return div;
+    })();
+
+    this.move = move;
+    var _x, _y, x_, y_;
+    var clicked = false;
+
+    this.open = function() {
+        var element = document.getElementsByClassName("window");
+        element[0].appendChild(this.folder);
+    }
+
+    this.close = function() {
+
+    }
+
+    this.folder.onmousemove = function(event) {
+        x_ = event.pageX;
+        y_ = event.pageY;
+        if(clicked) {
+            var gradient = move(this, _x, _y, x_, y_);
+            _x += gradient[0];
+            _y += gradient[1];
+        }
+    }
+
+    this.folder.onmousedown = function(event) {
+        _x = event.pageX;
+        _y = event.pageY;
+        clicked = true;
+    }
+
+    this.folder.onmouseup = function(event) {
+        clicked = false;
+    }
+
+    this.folder.ondblclick = function(event) {
+        var parent = document.getElementsByClassName("window");
+        var child = document.getElementById(info['id']);
+        parent[0].removeChild(child);
     }
 };
 
@@ -79,6 +129,5 @@ var move = function(icon, _x, _y, x_, y_) {
     var topVal = parseInt(icon.style.top, 10);
     icon.style.left = (leftVal + dx) + "px";
     icon.style.top = (topVal + dy) + "px";
-    icon.xpos += dx;
-    icon.ypos += dy;
+    return [dx, dy];
 }

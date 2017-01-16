@@ -22,3 +22,10 @@
 .folder {
     border: 3px solid black;
 }
+
+.fopened {
+    border: 1px solid red;
+    display: inline-block;
+    position: absolute;
+    margin: 20px;
+}
