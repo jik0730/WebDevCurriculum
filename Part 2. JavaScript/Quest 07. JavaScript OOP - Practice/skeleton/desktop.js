@@ -1,42 +1,55 @@
-var Desktop = function(icon, folder1, folder2) {
+var Desktop = function(win, icon, folder1, folder2) {
     /* TODO: Desktop 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
-    Icon(icon);
-    // this.folder1 = new Icon(win, folder1);
-    // this.folder2 = Icon(folder2);
+    this.icon = new Icon(win, icon, false);
+    this.folder1 = new Icon(win, folder1, true);
+    this.folder2 = new Icon(win, folder2, true);
 };
 
-var Icon = function(icon) {
+var Icon = function(win, icon, isFolder) {
     /* TODO: Icon 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
     // this.isFolder = isFolder; // 폴더인지 아닌지
     // this.open = openFolder; // 폴더라면, 더블클릭을 통한 폴더 열기 -> 함수 정의 필요
+    this.win = win;
     this.icon = icon;
     this.xpos = window.getComputedStyle(this.icon).getPropertyValue('left');
     this.ypos = window.getComputedStyle(this.icon).getPropertyValue('top');
+    this.isFolder = isFolder;
     this.move = move;
-    var _x, _y, x_, y_;
+    // var _x, _y, x_, y_;
 
-    icon.onmousedown = function() {
+    this.icon.onmousedown = function() {
         _x = event.clientX;
         _y = event.clientY;
-    }
-    this.onmousedown = function() {
-        console.log(_x, _y, x_, y_);
         console.log(this);
-        if(event.clientX != _x && event.clientY != _y) {
-            _x = -1;
-            _y = -1;
-        }
     }
-    this.onmouseup = function() {
+    // window.onmousedown = function() {
+    //     console.log(_x, _y, x_, y_);
+    //     console.log(this);
+    //     if(event.clientX != _x && event.clientY != _y) {
+    //         _x = -1;
+    //         _y = -1;
+    //     }
+    // }
+    this.win.onmousedown = function() {
+        console.log("HIHI");
+    }
+    this.icon.onmouseup = function() {
         x_ = event.clientX;
         y_ = event.clientY;
         console.log(_x, _y, x_, y_);
         if(_x == -1 && _y == -1) {
             // do nothing
         } else {
-            move(icon, _x, _y, x_, y_);
+            move(this, _x, _y, x_, y_);
         }
     }
+
+    if(isFolder) {
+        this.icon.ondblclick = function() {
+            console.log("HIHIHIHIHI");
+        }
+    }
+    
 };
 
 var Folder = function(folder) {
