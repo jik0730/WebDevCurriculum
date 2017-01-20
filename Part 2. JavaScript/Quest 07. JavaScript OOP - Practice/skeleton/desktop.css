@@ -29,3 +29,75 @@
     position: absolute;
     margin: 20px;
 }
+
+#openButton {
+    position: fixed;
+    display: block;
+    right: 60px;
+    bottom: 10px;
+}
+
+#closeButton {
+    position: fixed;
+    display: block;
+    right: 10px;
+    bottom: 10px;
+}
+
+#test {
+    position: absolute;
+    border: 1px solid red;
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    margin: 20px;
+    left: 450px;
+}
+
+.ftop {
+    border: 1px solid red;
+    height: 7px;
+}
+
+.fmidv {
+    border: 1px solid red;
+    /*height: 90px;*/
+}
+
+.fbot {
+    border: 1px solid red;
+    height: 7px;
+}
+
+.fleft {
+    border: 1px solid red;
+    width: 5px;
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+}
+
+.fmidh {
+    border: 1px solid red;
+    /*width: 88px;*/
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+}
+
+.fright {
+    border: 1px solid red;
+    width: 5px;
+    padding-top: 0px;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 0px;
+}
+
+table {
+    width: 100%;
+    height: 100%;
+    border-spacing: 0px;
+}
