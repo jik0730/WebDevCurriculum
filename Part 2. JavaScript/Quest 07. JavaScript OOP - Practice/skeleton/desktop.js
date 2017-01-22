@@ -28,7 +28,7 @@ var Icon = function(icon, isFolder, id) {
     // For icons
     var id = id;
     var icon = icon;
-    Moving(icon);
+    Moving(icon, icon);
 
     // For folders
     var isFolder = isFolder;
@@ -45,7 +45,6 @@ var Icon = function(icon, isFolder, id) {
 
     if(isFolder) {
         icon.ondblclick = function() {
-            console.log("HIIHHI");
             folder.open();
         }
     }
@@ -72,7 +71,25 @@ var Folder = function(info) {
         return div;
     })();
 
-    Moving(this.folder);
+    var topLeft = this.folder.getElementsByClassName('ftop')[0].getElementsByClassName('fleft')[0];
+    var topMid = this.folder.getElementsByClassName('ftop')[0].getElementsByClassName('fmidh')[0];
+    var topRight = this.folder.getElementsByClassName('ftop')[0].getElementsByClassName('fright')[0];
+    var midLeft = this.folder.getElementsByClassName('fmidv')[0].getElementsByClassName('fleft')[0];
+    var midRight = this.folder.getElementsByClassName('fmidv')[0].getElementsByClassName('fright')[0];
+    var botLeft = this.folder.getElementsByClassName('fbot')[0].getElementsByClassName('fleft')[0];
+    var botMid = this.folder.getElementsByClassName('fbot')[0].getElementsByClassName('fmidh')[0];
+    var botRight = this.folder.getElementsByClassName('fbot')[0].getElementsByClassName('fright')[0];
+
+    Moving(this.folder, this.folder.getElementsByClassName('fmidv')[0].getElementsByClassName('fmidh')[0]);
+    
+    Resizing(this.folder, topLeft, [true, true], [true, true]);
+    Resizing(this.folder, topMid, [true, false], [true, null]);
+    Resizing(this.folder, topRight, [true, true], [true, false]);
+    Resizing(this.folder, midLeft, [false, true], [null, true]);
+    Resizing(this.folder, midRight, [false, true], [null, false]);
+    Resizing(this.folder, botLeft, [true, true], [false, true]);
+    Resizing(this.folder, botMid, [true, false], [false, null]);
+    Resizing(this.folder, botRight, [true, true], [false, false]);
 
     this.open = function() {
         var element = document.getElementsByClassName("window");
@@ -100,17 +117,15 @@ var Window = function(win, icon, folder1, folder2) {
 };
 
 // Moving function with element.
-var Moving = function(icon) {
+var Moving = function(icon, movingArea) {
     var icon = icon;
+    var movingArea = movingArea;
     var _x, _y, x_, y_;
     var clicked = false;
     var win_left = 20;
     var win_top = 20;
-    var win_right = 780;
-    var win_bottom = 480;
-    var icon_width = parseInt(icon.style.width, 10);
-    var icon_height = parseInt(icon.style.height, 10);
-    console.log(icon_width, icon_height);
+    var win_right = 960;
+    var win_bottom = 650;
 
     document.getElementsByClassName('window')[0].addEventListener('mousemove', function(event){
         if(clicked){
@@ -122,13 +137,13 @@ var Moving = function(icon) {
         }
     });
 
-    icon.onmousedown = function(event) {
+    movingArea.onmousedown = function(event) {
         _x = event.pageX;
         _y = event.pageY;
         clicked = true;
     }
 
-    icon.onmouseup = function(event) {
+    movingArea.onmouseup = function(event) {
         clicked = false;
     }
 
@@ -137,6 +152,9 @@ var Moving = function(icon) {
         var dy = y_ - _y;
         var leftVal = parseInt(icon.style.left, 10);
         var topVal = parseInt(icon.style.top, 10);
+        var icon_width = parseInt(icon.style.width, 10);
+        var icon_height = parseInt(icon.style.height, 10);
+
         if(dx+leftVal+icon_width > win_right || dx+leftVal < -win_left) {
             dx = 0;
             clicked = false;
@@ -218,4 +236,84 @@ var CreateTable = function() {
     table.appendChild(tr3);
 
     return table;
-}
+};
+
+var Resizing = function(folder, area, direction, inverse) {
+    var folder = folder;
+    var area = area;
+    var direction = direction;
+    var inverse = inverse;
+    var clicked = false;
+    var _x, _y, x_, y_;
+
+    area.onmousedown = function(event) {
+        _x = event.pageX;
+        _y = event.pageY;
+        clicked = true;
+    }
+    area.onmouseup = function(event) {
+        clicked = false;
+    }
+    document.getElementsByClassName('window')[0].addEventListener('mousemove', function(event){
+        if(clicked){
+            x_ = event.pageX;
+            y_ = event.pageY;
+            var gradient = resize(area, _x, _y, x_, y_, direction, inverse);
+            _x += gradient[0];
+            _y += gradient[1];
+        }
+    });
+
+    var resize = function(area, _x, _y, x_, y_, direction, inverse) {
+        var dx = x_ - _x;
+        var dy = y_ - _y;
+        var leftVal = parseInt(folder.style.left, 10);
+        var topVal = parseInt(folder.style.top, 10);
+        var widthVal = parseInt(folder.style.width, 10);
+        var heightVal = parseInt(folder.style.height, 10);
+        var vertical_direction = direction[0];
+        var horizontal_direction = direction[1];
+        var vertical_inverse = inverse[0];
+        var horizontal_inverse = inverse[1];
+        
+        if(vertical_direction) {
+            if(vertical_inverse) {
+                if(heightVal < 30 && dy > 0) {
+                    dy = 0;
+                    clicked = false;
+                }
+                folder.style.top = (topVal + dy) + 'px';
+                folder.style.height = (heightVal - dy) + 'px';
+            } else {
+                if(heightVal < 30 && dy < 0) {
+                    dy = 0;
+                    clicked = false;
+                }
+                folder.style.height = (heightVal + dy) + 'px';
+            }
+        } else {
+            dy = 0;
+        }
+        
+        if(horizontal_direction) {
+            if(horizontal_inverse) {
+                if(widthVal < 30 && dx > 0) {
+                    dx = 0;
+                    clicked = false;
+                }
+                folder.style.left = (leftVal + dx) + 'px';
+                folder.style.width = (widthVal - dx) + 'px';
+            } else {
+                if(widthVal < 30 && dx < 0) {
+                    dx = 0;
+                    clicked = false;
+                }
+                folder.style.width = (widthVal + dx) + 'px';
+            }
+        } else {
+            dx = 0;
+        }
+
+        return [dx, dy];
+    }
+};
