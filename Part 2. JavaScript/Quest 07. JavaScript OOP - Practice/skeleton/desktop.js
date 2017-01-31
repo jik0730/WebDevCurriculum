@@ -23,12 +23,26 @@ var Desktop = function(desktop, win, icon, folder1, folder2) {
     }
 };
 
-var Icon = function(icon, isFolder, id) {
+var Icon = function(win, icon, isFolder, id) {
     /* TODO: Icon 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
     // For icons
+    var win = win;
+    var parent = win;
     var id = id;
     var icon = icon;
-    Moving(icon, icon);
+    Moving(win, icon, icon, this);
+
+    this.changeParent = function(newParent) {
+        if(parent != newParent) {
+            parent.removeChild(icon);
+            newParent.appendChild(icon);
+            parent = newParent;
+        }
+    }
+
+    this.getParent = function() {
+        return parent;
+    }
 
     // For folders
     var isFolder = isFolder;
@@ -40,7 +54,8 @@ var Icon = function(icon, isFolder, id) {
                                 top: '0px',
                                 width: '200px',
                                 height: '200px',
-                                id: id });
+                                id: id,
+                                win: win });
     }
 
     if(isFolder) {
@@ -70,6 +85,7 @@ var Folder = function(info) {
 
         return div;
     })();
+    var win = info['win'];
 
     var topLeft = this.folder.getElementsByClassName('ftop')[0].getElementsByClassName('fleft')[0];
     var topMid = this.folder.getElementsByClassName('ftop')[0].getElementsByClassName('fmidh')[0];
@@ -80,7 +96,7 @@ var Folder = function(info) {
     var botMid = this.folder.getElementsByClassName('fbot')[0].getElementsByClassName('fmidh')[0];
     var botRight = this.folder.getElementsByClassName('fbot')[0].getElementsByClassName('fright')[0];
 
-    Moving(this.folder, this.folder.getElementsByClassName('fmidv')[0].getElementsByClassName('fmidh')[0]);
+    Moving(win, this.folder, this.folder.getElementsByClassName('fmidv')[0].getElementsByClassName('fmidh')[0], this);
     
     Resizing(this.folder, topLeft, [true, true], [true, true]);
     Resizing(this.folder, topMid, [true, false], [true, null]);
@@ -107,25 +123,27 @@ var Folder = function(info) {
 var Window = function(win, icon, folder1, folder2) {
     /* TODO: Window 클래스는 어떤 멤버함수와 멤버변수를 가져야 할까요? */
     var win = win;
-    var icon = new Icon(icon, false, 'i1');
-    var folder1 = new Icon(folder1, true, 'f1');
-    var folder2 = new Icon(folder2, true, 'f2');
+    var icon = new Icon(win, icon, false, 'i1');
+    var folder1 = new Icon(win, folder1, true, 'f1');
+    var folder2 = new Icon(win, folder2, true, 'f2');
 
     this.getWindow = function() {
         return win;
-    }    
+    }
 };
 
 // Moving function with element.
-var Moving = function(icon, movingArea) {
+var Moving = function(win, icon, movingArea, thisObject) {
+    var thisObject = thisObject;
     var icon = icon;
     var movingArea = movingArea;
     var _x, _y, x_, y_;
     var clicked = false;
-    var win_left = 20;
-    var win_top = 20;
-    var win_right = 960;
-    var win_bottom = 650;
+    var win = win;
+    var win_left = parseInt(win.style.margin, 10);
+    var win_top = parseInt(win.style.margin, 10);
+    var win_right = parseInt(win.style.width, 10) - win_left;
+    var win_bottom = parseInt(win.style.height, 10) - win_top;
 
     document.getElementsByClassName('window')[0].addEventListener('mousemove', function(event){
         if(clicked){
@@ -143,8 +161,45 @@ var Moving = function(icon, movingArea) {
         clicked = true;
     }
 
-    movingArea.onmouseup = function(event) {
+    document.getElementsByClassName('window')[0].addEventListener('mouseup', function(event){
+        if(thisObject instanceof Icon) {
+            var folder = isInFolder(icon);
+            if(folder) {
+                thisObject.changeParent(folder);
+            } else {
+                thisObject.changeParent(win);
+            }
+        }
         clicked = false;
+    });
+
+    var isInFolder = function(icon) {
+        var icon = icon;
+        var ileft = parseInt(icon.style.left);
+        var itop = parseInt(icon.style.top);
+        var iright = parseInt(icon.style.width) + ileft;
+        var ibottom = parseInt(icon.style.height) + itop;
+
+        var folders = document.getElementsByClassName('fopened');
+        if(folders.length == 0) {
+            return false;
+        }
+        for(var i = 0; i < folders.length; i += 1) {
+            var fleft = parseInt(folders[i].style.left);
+            var ftop = parseInt(folders[i].style.top);
+            var fright = parseInt(folders[i].style.width) + fleft;
+            var fbottom = parseInt(folders[i].style.height) + ftop;
+            //if(parent is folder) {
+
+            //} else {
+                if(ileft > fleft && iright < fright && itop > ftop && ibottom < fbottom) {
+                    icon.style.left = (ileft - fleft - 20) + "px";
+                    icon.style.top = (itop - ftop - 20) + "px";
+                    return folders[i];
+                }
+            //}
+        }
+        return false;
     }
 
     var move = function(icon, _x, _y, x_, y_) {
